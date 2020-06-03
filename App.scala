@@ -22,7 +22,7 @@ val topic=spark.read.format("jdbc").option("url", orc).option("dbtable", "schema
 //topic dataframe contains list of URL(that give JSON as output in response body) under url column
 val idx=topic.select($"id",$"kpi",$"url",$"remark").collect() 
 for(i <- idx) {
-  var ipcount=Http(i(2).asInstanceOf[String]).header("Content-Type", "application/json").asString
+  var ipcount=Http(i(2).asInstanceOf[String]).header("Content-Type", "application/json").param("q", "smith").auth("username", "password").asString
   var rdd = sc.parallelize(Seq(ipcount.body))
   var jsonDF = spark.read.json(rdd.map(x => x.toString())).toDF //creating a DF out of json from response body
   //jsonDF.select(explode($"data.result.value").as("value")).printSchema
